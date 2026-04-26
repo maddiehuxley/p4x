@@ -43,7 +43,7 @@ export default function Hero() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.3 }}
           style={{ color: 'var(--text-secondary)', fontSize: '1.08rem', maxWidth: '540px', margin: '0 auto 2.5rem', lineHeight: 1.7 }}>
-          Paracord Exchange is what crypto trading should have always been — transparent, fully reserved, and open to audit. Built after FTX so that never happens again.
+          Paracord Exchange is what crypto trading should have always been: transparent, fully reserved, and open to audit.
         </motion.p>
 
         <motion.div
