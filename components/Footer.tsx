@@ -33,7 +33,7 @@ export default function Footer() {
             <h4 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: '0.18em', fontSize: '0.72rem', color: 'var(--cyan)', marginBottom: '1rem', textTransform: 'uppercase' }}>Principles</h4>
             {['Full Reserve', 'Open Source', 'Proof of Reserves', 'Zero Commingling'].map(l => (
               <div key={l} className="mb-2 flex items-center gap-2">
-                <div className="w-1 h-1 rounded-full" style={{ background: 'var(--cyan)', opacity: 0.5 }} />
+                <div className="w-1 h-1 rounded-full" style={{ background: 'var(--cyan-on-white)', opacity: 0.5 }} />
                 <span style={{ color: 'var(--text-muted)', fontSize: '0.85rem' }}>{l}</span>
               </div>
             ))}
