@@ -3,10 +3,10 @@ import { motion } from 'framer-motion'
 import { Shield, Eye, Code, Zap } from 'lucide-react'
 
 const principles = [
-  { icon: <Shield size={22} />, title: 'Full Reserve', description: 'Every asset is backed 1:1. No fractional reserves. No lending your funds without consent. What you deposit is what exists.' },
-  { icon: <Eye size={22} />, title: 'Proof of Reserves', description: "Cryptographic proof that we hold what we claim. Auditable by anyone, anytime. Not just a CEO's word." },
-  { icon: <Code size={22} />, title: 'Open Source', description: 'The matching engine, settlement logic, and reserve proofs are open for public audit. No black boxes.' },
-  { icon: <Zap size={22} />, title: 'Zero Commingling', description: 'Customer funds and operational funds are structurally separated. The FTX mistake is architectural, not just ethical.' },
+  { icon: <Shield size={22} />, title: 'Full Reserve', description: 'Every asset is backed 1:1. No fractional reserves or lending your funds without consent, What you deposit is what exists.' },
+  { icon: <Eye size={22} />, title: 'Proof of Reserves', description: "Cryptographic proof that we hold what we claim. Auditable by anyone, anytime." },
+  { icon: <Code size={22} />, title: 'Open Source', description: 'The matching engine, settlement logic, and reserve proofs are open for public audit.' },
+  { icon: <Zap size={22} />, title: 'Zero Commingling', description: 'Customer funds and operational funds are structurally separated.' },
 ]
 
 export default function Principles() {
@@ -19,10 +19,10 @@ export default function Principles() {
         transition={{ duration: 0.5 }}
         className="text-center mb-12">
         <h2 style={{ fontFamily: 'var(--font-display)', fontWeight: 700, letterSpacing: '0.06em', fontSize: '1.9rem', marginBottom: '0.75rem' }}>
-          The Anti-FTX Exchange
+          The Alternative Exchange
         </h2>
         <p style={{ color: 'var(--text-secondary)', maxWidth: '500px', margin: '0 auto', lineHeight: 1.7, fontSize: '0.9rem' }}>
-          Every structural decision P4X makes is a direct response to how FTX failed its users.
+          Every structural decision P4X makes is a direct response to how mainstream exchanges failed their users.
         </p>
       </motion.div>
 
