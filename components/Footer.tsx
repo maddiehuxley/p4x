@@ -11,7 +11,7 @@ export default function Footer() {
               <Logo variant="cyan" width={110} />
             </div>
             <p style={{ color: 'var(--text-muted)', fontSize: '0.85rem', lineHeight: 1.7, maxWidth: '320px' }}>
-              A transparent, full-reserve cryptocurrency exchange built on open-source principles. No fractional reserves. No commingled funds. No FTX.
+              A transparent, full-reserve cryptocurrency exchange built on open-source principles.
             </p>
           </div>
 
