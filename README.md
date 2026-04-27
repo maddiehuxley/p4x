@@ -1,6 +1,6 @@
 # P4X — Paracord Exchange
 
-A transparent, full-reserve cryptocurrency exchange. Built as a direct answer to the FTX collapse.
+A transparent, full-reserve cryptocurrency exchange. 
 
 ## Tech
 - **Next.js 14** (App Router)
