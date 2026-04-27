@@ -9,7 +9,8 @@ type Coin = {
   total_volume: number; image: string; market_cap_rank: number
 }
 
-function fmt(n: number) {
+function fmt(n: number | null | undefined) {
+  if (typeof n !== 'number' || !Number.isFinite(n)) return '—'
   if (n >= 1e9) return `$${(n / 1e9).toFixed(2)}B`
   if (n >= 1e6) return `$${(n / 1e6).toFixed(2)}M`
   return `$${n.toLocaleString()}`
@@ -25,7 +26,7 @@ export default function MarketTable({ limit = 20 }: { limit?: number }) {
     const fetch_ = async () => {
       try {
         const res = await fetch(
-          `https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=${limit}&page=1&sparkline=false`
+          `/api/coingecko/markets?per_page=${limit}&sparkline=false`
         )
         if (res.ok) {
           const data: Coin[] = await res.json()
@@ -90,8 +91,10 @@ export default function MarketTable({ limit = 20 }: { limit?: number }) {
                 </tr>
               ))
             ) : coins.map((coin, i) => {
-              const pos = coin.price_change_percentage_24h >= 0
-              const zero = Math.abs(coin.price_change_percentage_24h) < 0.05
+              const price = typeof coin.current_price === 'number' ? coin.current_price : null
+              const change = typeof coin.price_change_percentage_24h === 'number' ? coin.price_change_percentage_24h : null
+              const pos = (change ?? 0) >= 0
+              const zero = change === null || Math.abs(change) < 0.05
               const flash = flashes[coin.id]
               return (
                 <motion.tr
@@ -118,15 +121,17 @@ export default function MarketTable({ limit = 20 }: { limit?: number }) {
                     </div>
                   </td>
                   <td className="px-6 py-4" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.85rem', fontWeight: 500 }}>
-                    ${coin.current_price < 1
-                      ? coin.current_price.toFixed(4)
-                      : coin.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                    {price === null
+                      ? '—'
+                      : price < 1
+                        ? `$${price.toFixed(4)}`
+                        : `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-1"
                       style={{ color: zero ? 'var(--text-muted)' : pos ? 'var(--green)' : 'var(--red)', fontFamily: 'var(--font-mono)', fontSize: '0.8rem', fontWeight: 500 }}>
                       {zero ? <Minus size={12} /> : pos ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-                      {pos && !zero ? '+' : ''}{coin.price_change_percentage_24h.toFixed(2)}%
+                      {change === null ? '—' : `${pos && !zero ? '+' : ''}${change.toFixed(2)}%`}
                     </div>
                   </td>
                   <td className="px-6 py-4" style={{ fontFamily: 'var(--font-mono)', fontSize: '0.8rem', color: 'var(--text-secondary)' }}>

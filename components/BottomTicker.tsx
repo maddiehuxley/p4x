@@ -45,7 +45,7 @@ export default function BottomTicker() {
     const fetch_ = async () => {
       try {
         const res = await fetch(
-          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=15&page=1&sparkline=true&price_change_percentage=24h'
+          '/api/coingecko/markets?per_page=15&sparkline=true&price_change_percentage=24h'
         )
         if (res.ok) setCoins(await res.json())
       } catch {}

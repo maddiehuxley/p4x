@@ -19,7 +19,7 @@ export default function TickerTape() {
     const fetch_ = async () => {
       try {
         const res = await fetch(
-          'https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&page=1&sparkline=false'
+          '/api/coingecko/markets?per_page=20&sparkline=false'
         )
         if (res.ok) setCoins(await res.json())
       } catch {}
@@ -41,17 +41,19 @@ export default function TickerTape() {
 
       <div className="ticker-track h-full flex items-center">
         {items.map((coin, i) => {
-          const pos = coin.price_change_percentage_24h >= 0
+          const price = typeof coin.current_price === 'number' ? coin.current_price : null
+          const change = typeof coin.price_change_percentage_24h === 'number' ? coin.price_change_percentage_24h : null
+          const pos = (change ?? 0) >= 0
           return (
             <div key={`${coin.id}-${i}`} className="flex items-center gap-2 px-5 whitespace-nowrap">
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
                 {coin.symbol.toUpperCase()}
               </span>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.72rem', color: 'var(--text-primary)', fontWeight: 500 }}>
-                ${coin.current_price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {price !== null ? `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : '—'}
               </span>
               <span style={{ fontFamily: 'var(--font-mono)', fontSize: '0.65rem', color: pos ? 'var(--green)' : 'var(--red)', fontWeight: 500 }}>
-                {pos ? '+' : ''}{coin.price_change_percentage_24h.toFixed(2)}%
+                {change !== null ? `${pos ? '+' : ''}${change.toFixed(2)}%` : ''}
               </span>
               <span style={{ color: 'rgba(0, 207, 255, 0.2)', marginLeft: '0.5rem' }}>·</span>
             </div>

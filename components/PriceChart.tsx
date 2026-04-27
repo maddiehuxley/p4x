@@ -104,7 +104,7 @@ export default function PriceChart() {
     if (!s) return
     setLoading(true)
     try {
-      const res = await fetch(`https://api.coingecko.com/api/v3/coins/${selectedCoin.id}/ohlc?vs_currency=usd&days=${selectedRange.days}`)
+      const res = await fetch(`/api/coingecko/ohlc?id=${selectedCoin.id}&days=${selectedRange.days}`)
       if (!res.ok) throw new Error()
       const raw: number[][] = await res.json()
       const bars: OHLCBar[] = raw.map(([t, o, h, l, c]) => ({
