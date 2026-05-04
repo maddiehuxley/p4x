@@ -11,7 +11,8 @@ import type { User } from '@supabase/supabase-js'
 const navLinks = [
   { href: '/markets', label: 'Markets' },
   { href: '/dashboard', label: 'Dashboard' },
-  { href: '/wallet', label: 'Wallet', soon: true },
+  { href: '/portfolio', label: 'Portfolio' },
+  { href: '/watchlist', label: 'Watchlist' },
   { href: '/trade', label: 'Trade', soon: true },
 ]
 

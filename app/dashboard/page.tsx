@@ -6,7 +6,8 @@ import ComingSoon from '@/components/ComingSoon'
 import Footer from '@/components/Footer'
 import BottomTicker from '@/components/BottomTicker'
 import DashboardStats from '@/components/DashboardStats'
-import { Wallet, BarChart2, ArrowLeftRight } from 'lucide-react'
+import LiveCard from '@/components/LiveCard'
+import { Wallet, ArrowLeftRight, Eye } from 'lucide-react'
 
 export const dynamic = 'force-dynamic'
 
@@ -36,9 +37,9 @@ export default async function Dashboard() {
           <PriceChart />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <ComingSoon title="Wallet" description="Deposit and withdraw crypto assets. Full reserve — your funds are always yours." icon={<Wallet size={36} />} />
+          <LiveCard title="Portfolio" description="View your full crypto net worth across every major chain. Read-only — your keys never touch P4X." icon={<Wallet size={36} />} href="/portfolio" />
+          <LiveCard title="Watchlist" description="Track tokens you care about. Get alerted when prices move (alerts coming soon)." icon={<Eye size={36} />} href="/watchlist" />
           <ComingSoon title="Trading" description="Spot trading with a transparent order book. No front-running, no hidden fees." icon={<ArrowLeftRight size={36} />} />
-          <ComingSoon title="Portfolio Analytics" description="Track your P&L, exposure, and performance across all positions over time." icon={<BarChart2 size={36} />} />
         </div>
       </main>
       <Footer />
