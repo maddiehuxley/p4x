@@ -7,18 +7,18 @@ if (!ALCHEMY_KEY && process.env.NODE_ENV !== 'test') {
   console.warn('[p4x] ALCHEMY_API_KEY not set — EVM portfolio queries will fail')
 }
 
-interface AlchemyTokenBalance {
+interface AlchemyToken {
   network: string
   address: string
   tokenAddress: string | null
   tokenBalance: string
-  tokenMetadata: {
-    symbol: string | null
-    name: string | null
-    decimals: number | null
-    logo: string | null
+  tokenMetadata?: {
+    symbol?: string | null
+    name?: string | null
+    decimals?: number | null
+    logo?: string | null
   }
-  tokenPrices: Array<{
+  tokenPrices?: Array<{
     currency: string
     value: string
     lastUpdatedAt: string
@@ -35,37 +35,39 @@ const NETWORK_TO_CHAIN: Record<string, ChainId> = {
 
 /**
  * Fetch all token balances for an EVM address across all supported chains.
- * Uses Alchemy's Portfolio API which batches everything into a single request.
+ * Uses Alchemy's Portfolio API "Tokens By Wallet" endpoint, which returns
+ * tokens with metadata and prices in a single batched call.
+ *
+ * Endpoint: POST /data/v1/{apiKey}/assets/tokens/by-address
+ * Docs: https://www.alchemy.com/docs/data/portfolio-apis/portfolio-api-endpoints/portfolio-api-endpoints/get-tokens-by-address
  */
 export async function fetchEvmBalances(address: string): Promise<TokenBalance[]> {
   if (!ALCHEMY_KEY) throw new Error('Alchemy API key not configured')
 
   const networks = EVM_CHAINS.map((c) => CHAINS[c].alchemyNetwork!).filter(Boolean)
 
-  const url = `https://api.g.alchemy.com/data/v1/${ALCHEMY_KEY}/assets/tokens/balances/by-address`
+  const url = `https://api.g.alchemy.com/data/v1/${ALCHEMY_KEY}/assets/tokens/by-address`
 
   const res = await fetch(url, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({
-      addresses: [
-        {
-          address,
-          networks,
-        },
-      ],
+      addresses: [{ address, networks }],
+      withMetadata: true,
+      withPrices: true,
       includeNativeTokens: true,
-      includePrices: true,
+      includeErc20Tokens: true,
     }),
     cache: 'no-store',
   })
 
   if (!res.ok) {
-    throw new Error(`Alchemy balances request failed: ${res.status}`)
+    const text = await res.text().catch(() => '')
+    throw new Error(`Alchemy tokens request failed: ${res.status} ${text.slice(0, 200)}`)
   }
 
   const json = await res.json()
-  const tokens: AlchemyTokenBalance[] = json?.data?.tokens ?? []
+  const tokens: AlchemyToken[] = json?.data?.tokens ?? []
 
   return tokens
     .map((t): TokenBalance | null => {
@@ -73,17 +75,22 @@ export async function fetchEvmBalances(address: string): Promise<TokenBalance[]>
       if (!chain) return null
 
       const decimals = t.tokenMetadata?.decimals ?? 18
-      const rawBalance = BigInt(t.tokenBalance || '0')
-      const balance = Number(rawBalance) / 10 ** decimals
+      let balance = 0
+      try {
+        const raw = BigInt(t.tokenBalance || '0x0')
+        balance = Number(raw) / 10 ** decimals
+      } catch {
+        // Hex parse can fail on weird values — skip
+        return null
+      }
 
-      // Skip dust and likely-spam tokens with no price + no metadata
       if (balance === 0) return null
 
       const usdPriceEntry = t.tokenPrices?.find((p) => p.currency === 'usd')
       const priceUsd = usdPriceEntry ? parseFloat(usdPriceEntry.value) : null
       const valueUsd = priceUsd !== null ? balance * priceUsd : 0
 
-      // Filter spam: tokens with balance but no price and no recognized metadata
+      // Filter likely-spam: no price AND no symbol
       if (priceUsd === null && !t.tokenMetadata?.symbol) return null
 
       return {
@@ -95,7 +102,7 @@ export async function fetchEvmBalances(address: string): Promise<TokenBalance[]>
         decimals,
         priceUsd,
         valueUsd,
-        change24h: null, // Alchemy doesn't return 24h change; we'll enrich from CoinGecko separately if needed
+        change24h: null,
         logoUrl: t.tokenMetadata?.logo ?? null,
       }
     })
@@ -105,7 +112,7 @@ export async function fetchEvmBalances(address: string): Promise<TokenBalance[]>
 
 /**
  * Fetch recent transactions for an EVM address on a single chain.
- * Limited to 25 most recent for the portfolio overview.
+ * Uses the Node API's alchemy_getAssetTransfers (separate endpoint, separate URL pattern).
  */
 export async function fetchEvmTransactions(
   address: string,
@@ -171,7 +178,6 @@ export async function fetchEvmTransactions(
     }
   })
 
-  // Dedupe by hash, sort by time desc
   const seen = new Set<string>()
   const deduped = all.filter((tx) => {
     if (seen.has(tx.hash)) return false
